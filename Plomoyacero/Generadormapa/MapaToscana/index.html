@@ -18,7 +18,12 @@
   aspect-ratio: 5 / 4;
   display: block;
   margin: 0 auto;
- const backgroundImage = new Image();
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+
+        const backgroundImage = new Image();
 backgroundImage.src = 'MapaNoHex.png';
 
 backgroundImage.onload = function () {
@@ -52,13 +57,6 @@ function drawMap(highlighted = null) {
     drawCoordinates(cx, cy, q, r);
   }
 }
-
-    canvas {
-      border: 5px solid #471e00;
-        background-image: url('mapanohex.png');  
-        background-size: 830px 710px;   
-        background-repeat: no-repeat;
-        background-position: 42% 50%;
 
 
         
@@ -114,7 +112,7 @@ function drawMap(highlighted = null) {
       ctx.font = "10px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(`${diag1},${diag2}`, x, y);
+      ctx.fillText(${diag1},${diag2}, x, y);
     }
 
     // Generar todas las coordenadas dentro de un rectángulo visual de 23x17 hexágonos
