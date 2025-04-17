@@ -36,7 +36,7 @@
     const canvas = document.getElementById("hexCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Tamaño del hexágono (de centro a vértice)
+    // 🟠 Tamaño del hexágono (de centro a vértice)
     const hexSize = 28;
 
     const mapCols = 23;
@@ -66,7 +66,9 @@
       vacio: [
         [21, 11], [15, 11]
       ],
-
+      DDiego: [
+        [13, 9]
+      ]
     };
 
     function añadirHexagonosARango(region, qFijo, rInicio, rFin) {
@@ -157,7 +159,7 @@ ctx.drawImage(backgroundImage, 0, 0, 970, 790);
         else if (regiones.ciudad.some(h => h[0] === q && h[1] === r)) color = "rgba(255,131,0,0.4)";
         else if (regiones.mar.some(h => h[0] === q && h[1] === r)) color = "rgba(0,61,255,0.4)";
         else if (regiones.vacio.some(h => h[0] === q && h[1] === r)) color = "rgba(255,233,201,0.4)";
-        else if (regiones.DDiego.some(h => h[0] === q && h[1] === r)) color = "rgba(255,47,47,0.5)";
+  
 
         drawHex(cx, cy, color);
         drawCoordinates(cx, cy, q, r);
