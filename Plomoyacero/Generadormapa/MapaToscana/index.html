@@ -1,66 +1,25 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<title>Generador de eventos</title>
-<style>
+  <meta charset="utf-8"/>
+  <title>Generador de eventos</title>
+  <style>
     body {
       text-align: center;
       font-family: sans-serif;
       background-color: #DEB887;
     }
+
     canvas {
       border: 5px solid #471e00;
-  width: 100%;
-  height: auto;
-  max-width: 1000px;
-  aspect-ratio: 5 / 4;
-  display: block;
-  margin: 0 auto;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-
-
-        const backgroundImage = new Image();
-backgroundImage.src = 'MapaNoHex.png';
-
-backgroundImage.onload = function () {
-  drawMap(); // solo cuando la imagen está lista
-};
-
-function drawMap(highlighted = null) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // 👇 Dibuja la imagen de fondo dentro del canvas
-  ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-
-  const [firstX, firstY] = hexToPixel(0, 0);
-  const [lastX, lastY] = hexToPixel(mapCols - 1, mapRows - 1);
-  const offsetX = (canvas.width - (lastX + size - firstX)) / 2;
-  const offsetY = (canvas.height - (lastY + size - firstY)) / 2;
-
-  for (const [q, r] of hexes) {
-    const [x, y] = hexToPixel(q, r);
-    const cx = x + offsetX;
-    const cy = y + offsetY;
-    const isRandom = highlighted && highlighted[0] === q && highlighted[1] === r;
-    let color = "rgba(255,196,126,0.4)";
-    if (isRandom) color = "rgba(255,0,0,0.7)";
-    else if (regiones.ciudad.some(h => h[0] === q && h[1] === r)) color = "rgba(255,131,0,0.4)";
-    else if (regiones.mar.some(h => h[0] === q && h[1] === r)) color = "rgb(0, 61, 255,0.4)";
-    else if (regiones.vacio.some(h => h[0] === q && h[1] === r)) color = "rgba(255,233, 201,0.4)";
-    else if (regiones.DDiego.some(h => h[0] === q && h[1] === r)) color = "rgb(255, 47, 47,0.5)";
-
-    drawHex(cx, cy, color);
-    drawCoordinates(cx, cy, q, r);
-  }
-}
-
-
-        
+      width: 100%;
+      height: auto;
+      max-width: 1000px;
+      aspect-ratio: 5 / 4;
+      display: block;
+      margin: 0 auto;
     }
+
     button {
       margin-top: 10px;
       padding: 8px 16px;
@@ -70,24 +29,74 @@ function drawMap(highlighted = null) {
   </style>
 </head>
 <body>
-<h1>Mapa de eventos</h1>
-<canvas height="800" id="hexCanvas" width="1000"></canvas><br/>
-<button onclick="highlightRandomHex()">Producir evento</button>
-<script>
+  <h1>Mapa de eventos</h1>
+  <canvas id="hexCanvas" width="1000" height="800"></canvas>
+  <br/>
+  <button onclick="highlightRandomHex()">Producir evento</button>
+
+  <script>
     const canvas = document.getElementById("hexCanvas");
     const ctx = canvas.getContext("2d");
-    const size = 24;  // Radio del hexágono en píxeles
-    const mapCols = 23;  // Número de columnas de hexágonos
-    const mapRows = 17;  // Número de filas de hexágonos
 
-    // Convertir axial q,r a coordenadas x,y en píxeles (horizontal layout)
+    const size = 24;
+    const mapCols = 23;
+    const mapRows = 17;
+
+    const hexes = [];
+    for (let col = 0; col < mapCols; col++) {
+      for (let row = 0; row < mapRows; row++) {
+        hexes.push([col, row]);
+      }
+    }
+
+    const regiones = {
+      ciudad: [
+        [3, 4], [4, 4], [4, 5], [9, 7], [10, 7], [10, 8], [3, 7], [4, 8], [3, 8],
+        [17, 7], [17, 8], [18, 8], [15, 2], [15, 1], [14, 2]
+      ],
+      mar: [
+        [3, 16], [3, 15], [7, 12], [7, 13], [7, 14], [11, 16],
+        [7, 16], [6, 16], [5, 16], [4, 16], [7, 15], [6, 15], [5, 15], [4, 15],
+        [3, 10], [3, 11], [3, 12], [3, 13], [3, 14],
+        [5, 11], [5, 12], [5, 13], [5, 14], [4, 11], [4, 12], [4, 13],
+        [4, 14], [6, 12], [6, 13], [6, 14], [8, 14], [8, 15], [3, 8],
+        [0, 15]
+      ],
+      vacio: [
+        [21, 11], [15, 11]
+      ],
+      DDiego: [
+        [13, 9]
+      ]
+    };
+
+    function añadirHexagonosARango(region, qFijo, rInicio, rFin) {
+      for (let r = rInicio; r <= rFin; r++) {
+        regiones[region].push([qFijo, r]);
+      }
+    }
+
+    // Añadir rangos
+    añadirHexagonosARango("mar", 0, 2, 16);
+    añadirHexagonosARango("mar", 1, 3, 7);
+    añadirHexagonosARango("mar", 1, 9, 16);
+    añadirHexagonosARango("mar", 2, 7, 16);
+    añadirHexagonosARango("vacio", 22, 12, 16);
+    añadirHexagonosARango("vacio", 21, 12, 16);
+    añadirHexagonosARango("vacio", 20, 11, 16);
+    añadirHexagonosARango("vacio", 19, 10, 16);
+    añadirHexagonosARango("vacio", 18, 10, 16);
+    añadirHexagonosARango("vacio", 17, 10, 16);
+    añadirHexagonosARango("vacio", 16, 11, 16);
+    añadirHexagonosARango("vacio", 15, 12, 16);
+    añadirHexagonosARango("vacio", 14, 13, 16);
+
     function hexToPixel(q, r) {
       const x = size * 3/2 * q;
       const y = size * Math.sqrt(3) * (r + 0.5 * (q % 2));
       return [x, y];
     }
 
-    // Dibujar un hexágono
     function drawHex(x, y, fill = "#ddd", stroke = "#000") {
       ctx.beginPath();
       for (let i = 0; i < 6; i++) {
@@ -104,79 +113,22 @@ function drawMap(highlighted = null) {
       ctx.stroke();
     }
 
-    // Escribir coordenadas diagonales en el centro del hexágono
     function drawCoordinates(x, y, q, r) {
-      const diag1 = q;           // eje q (diagonal principal)
-      const diag2 = r;           // eje r (diagonal secundaria)
       ctx.fillStyle = "black";
       ctx.font = "10px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(${diag1},${diag2}, x, y);
+      ctx.fillText(`${q},${r}`, x, y);
     }
 
-    // Generar todas las coordenadas dentro de un rectángulo visual de 23x17 hexágonos
-    const hexes = [];
-    for (let col = 0; col < mapCols; col++) {
-      for (let row = 0; row < mapRows; row++) {
-        hexes.push([col, row]);
-      }
-    }
-
-    //Colorear hexágonos
-    const regiones = {
-  ciudad: [
-  [3, 4], [4, 4], [4, 5], [9, 7], [10, 7], [10, 8], [3, 7], [4, 8], [3, 8],
-  [17, 7], [17, 8], [18, 8], [15, 2], [15, 1], [14, 2], 
-  ], 
-
-  mar: [
-  [3, 16], [3, 15],
- [7, 12], [7, 13], [7, 14], [11, 16],
-  [7, 16], [6, 16], [5, 16], [4, 16], [7, 15], [6, 15], [5, 15], [4, 15],
-    [3, 10], [3, 11], [3, 12], [3, 13], [3, 14],
-  [5, 11], [5, 12],[5, 13],[5, 14],[4, 11], [4, 12], [4, 13], 
-  [4, 14], [6, 12], [6, 13], [6, 14], [8, 14], [8, 15], [3, 8],
-  [0, 15]
-  ],
-
-  vacio: [
-  [21, 11], [15, 11]
-  ], 
-
-  DDiego: [
-  [13, 9]
-  ], 
-};
-
-    // Función para añadir un bloque de hexágonos verticales a una región
-    //Por ejemplo: añadirHexagonosARango("ciudad", 11, 1, 7); El primer número es la columna, los dos siguientes, el rango
-
-    function añadirHexagonosARango(region, qFijo, rInicio, rFin) {
-      for (let r = rInicio; r <= rFin; r++) {
-        regiones[region].push([qFijo, r]);
-      }
-    }
-
-añadirHexagonosARango("mar", 0, 2, 16);
-añadirHexagonosARango("mar", 1, 9, 16);
-añadirHexagonosARango("mar", 1, 3, 7);
-añadirHexagonosARango("mar", 2, 7, 16);
-añadirHexagonosARango("vacio", 22, 12, 16);
-añadirHexagonosARango("vacio", 21, 12, 16);
-añadirHexagonosARango("vacio", 20, 11, 16);
-añadirHexagonosARango("vacio", 19, 10, 16);
-añadirHexagonosARango("vacio", 18, 10, 16);
-añadirHexagonosARango("vacio", 17, 10, 16);
-añadirHexagonosARango("vacio", 16, 11, 16);
-añadirHexagonosARango("vacio", 15, 12, 16);
-añadirHexagonosARango("vacio", 14, 13, 16);
-
-
-
-    // Centramos el mapa horizontal y verticalmente
     function drawMap(highlighted = null) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Fondo como imagen
+      if (backgroundImage.complete) {
+        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+      }
+
       const [firstX, firstY] = hexToPixel(0, 0);
       const [lastX, lastY] = hexToPixel(mapCols - 1, mapRows - 1);
       const offsetX = (canvas.width - (lastX + size - firstX)) / 2;
@@ -186,14 +138,14 @@ añadirHexagonosARango("vacio", 14, 13, 16);
         const [x, y] = hexToPixel(q, r);
         const cx = x + offsetX;
         const cy = y + offsetY;
+
         const isRandom = highlighted && highlighted[0] === q && highlighted[1] === r;
         let color = "rgba(255,196,126,0.4)";
-if (isRandom) color = "rgba(255,0,0,0.7)";
-else if (regiones.ciudad.some(h => h[0] === q && h[1] === r)) color = "rgba(255,131,0,0.4)";
-else if (regiones.mar.some(h => h[0] === q && h[1] === r)) color = "rgb(0, 61, 255,0.4)";
-else if (regiones.vacio.some(h => h[0] === q && h[1] === r)) color = "rgba(255,233, 201,0.4)";
-else if (regiones.DDiego.some(h => h[0] === q && h[1] === r)) color = "rgb(255, 47, 47,0.5)";
-
+        if (isRandom) color = "rgba(255,0,0,0.7)";
+        else if (regiones.ciudad.some(h => h[0] === q && h[1] === r)) color = "rgba(255,131,0,0.4)";
+        else if (regiones.mar.some(h => h[0] === q && h[1] === r)) color = "rgba(0, 61, 255,0.4)";
+        else if (regiones.vacio.some(h => h[0] === q && h[1] === r)) color = "rgba(255,233,201,0.4)";
+        else if (regiones.DDiego.some(h => h[0] === q && h[1] === r)) color = "rgba(255, 47, 47,0.5)";
 
         drawHex(cx, cy, color);
         drawCoordinates(cx, cy, q, r);
@@ -205,17 +157,12 @@ else if (regiones.DDiego.some(h => h[0] === q && h[1] === r)) color = "rgb(255, 
       drawMap(random);
     }
 
-const backgroundImage = new Image();
-backgroundImage.src = 'MapaNoHex.png';
+    const backgroundImage = new Image();
+    backgroundImage.src = 'MapaNoHex.png';
 
-backgroundImage.onload = function () {
-  drawMap(); // solo dibuja el mapa cuando la imagen está lista
-};
-
-
-    
-    
-    drawMap(); // Dibuja el mapa al cargar
+    backgroundImage.onload = () => drawMap();
   </script>
 </body>
 </html>
+
+
