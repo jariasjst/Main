@@ -128,16 +128,14 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // --- 1. Dibujar la imagen de fondo escalada y centrada ---
-      const margin = size;  // margen de media celda
-      const imgX = margin;
-      const imgY = margin;
-      const scale = 1.0;
+      // Dibujar la imagen de fondo escalada al 80% y centrada
+const scale = 0.8;
 const imgWidth = canvas.width * scale;
 const imgHeight = canvas.height * scale;
 const imgX = (canvas.width - imgWidth) / 2;
 const imgY = (canvas.height - imgHeight) / 2;
-      ctx.drawImage(backgroundImage, imgX, imgY, imgWidth, imgHeight);
 
+ctx.drawImage(backgroundImage, imgX, imgY, imgWidth, imgHeight);
       
       // --- 2. Dibujar los hexágonos ---
       const [firstX, firstY] = hexToPixel(0, 0);
