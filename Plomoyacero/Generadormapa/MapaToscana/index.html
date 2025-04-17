@@ -37,7 +37,6 @@
   <script>
     const canvas = document.getElementById("hexCanvas");
     const ctx = canvas.getContext("2d");
-
     const size = 24;
     const mapCols = 23;
     const mapRows = 17;
@@ -51,16 +50,17 @@
 
     const regiones = {
       ciudad: [
-        [3, 4], [4, 4], [4, 5], [9, 7], [10, 7], [10, 8], [3, 7], [4, 8], [3, 8],
-        [17, 7], [17, 8], [18, 8], [15, 2], [15, 1], [14, 2]
+        [3, 4], [4, 4], [4, 5], [9, 7], [10, 7], [10, 8],
+        [3, 7], [4, 8], [3, 8], [17, 7], [17, 8], [18, 8],
+        [15, 2], [15, 1], [14, 2]
       ],
       mar: [
         [3, 16], [3, 15], [7, 12], [7, 13], [7, 14], [11, 16],
-        [7, 16], [6, 16], [5, 16], [4, 16], [7, 15], [6, 15], [5, 15], [4, 15],
-        [3, 10], [3, 11], [3, 12], [3, 13], [3, 14],
-        [5, 11], [5, 12], [5, 13], [5, 14], [4, 11], [4, 12], [4, 13],
-        [4, 14], [6, 12], [6, 13], [6, 14], [8, 14], [8, 15], [3, 8],
-        [0, 15]
+        [7, 16], [6, 16], [5, 16], [4, 16], [7, 15], [6, 15],
+        [5, 15], [4, 15], [3, 10], [3, 11], [3, 12], [3, 13],
+        [3, 14], [5, 11], [5, 12], [5, 13], [5, 14], [4, 11],
+        [4, 12], [4, 13], [4, 14], [6, 12], [6, 13], [6, 14],
+        [8, 14], [8, 15], [3, 8], [0, 15]
       ],
       vacio: [
         [21, 11], [15, 11]
@@ -76,7 +76,7 @@
       }
     }
 
-    // Añadir rangos
+    // Rellenar regiones adicionales
     añadirHexagonosARango("mar", 0, 2, 16);
     añadirHexagonosARango("mar", 1, 3, 7);
     añadirHexagonosARango("mar", 1, 9, 16);
@@ -121,14 +121,21 @@
       ctx.fillText(`${q},${r}`, x, y);
     }
 
+    const backgroundImage = new Image();
+    backgroundImage.src = 'MapaNoHex.png';
+
     function drawMap(highlighted = null) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Fondo como imagen
-      if (backgroundImage.complete) {
-        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-      }
+      // --- 1. Dibujar la imagen de fondo escalada y centrada ---
+      const margin = size;  // margen de media celda
+      const imgX = margin;
+      const imgY = margin;
+      const imgWidth = canvas.width - 2 * margin;
+      const imgHeight = canvas.height - 2 * margin;
+      ctx.drawImage(backgroundImage, imgX, imgY, imgWidth, imgHeight);
 
+      // --- 2. Dibujar los hexágonos ---
       const [firstX, firstY] = hexToPixel(0, 0);
       const [lastX, lastY] = hexToPixel(mapCols - 1, mapRows - 1);
       const offsetX = (canvas.width - (lastX + size - firstX)) / 2;
@@ -141,11 +148,12 @@
 
         const isRandom = highlighted && highlighted[0] === q && highlighted[1] === r;
         let color = "rgba(255,196,126,0.4)";
+
         if (isRandom) color = "rgba(255,0,0,0.7)";
         else if (regiones.ciudad.some(h => h[0] === q && h[1] === r)) color = "rgba(255,131,0,0.4)";
-        else if (regiones.mar.some(h => h[0] === q && h[1] === r)) color = "rgba(0, 61, 255,0.4)";
+        else if (regiones.mar.some(h => h[0] === q && h[1] === r)) color = "rgba(0,61,255,0.4)";
         else if (regiones.vacio.some(h => h[0] === q && h[1] === r)) color = "rgba(255,233,201,0.4)";
-        else if (regiones.DDiego.some(h => h[0] === q && h[1] === r)) color = "rgba(255, 47, 47,0.5)";
+        else if (regiones.DDiego.some(h => h[0] === q && h[1] === r)) color = "rgba(255,47,47,0.5)";
 
         drawHex(cx, cy, color);
         drawCoordinates(cx, cy, q, r);
@@ -157,12 +165,9 @@
       drawMap(random);
     }
 
-    const backgroundImage = new Image();
-    backgroundImage.src = 'MapaNoHex.png';
-
-    backgroundImage.onload = () => drawMap();
+    backgroundImage.onload = function () {
+      drawMap();
+    };
   </script>
 </body>
 </html>
-
-
