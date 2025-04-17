@@ -72,17 +72,20 @@
                 if (probArmaDisparo < 10) {
                     armaDisparo = "arco compuesto";
                     espacios--;
-                } else if (probArmaDisparo < 30) {
+                } else if (probArmaDisparo < 25) {
                     armaDisparo = "arcabuz de caza";
                     espacios--;
-                } else if (probArmaDisparo < 50) {
+                } else if (probArmaDisparo < 40) {
                     armaDisparo = "arcabuz de repetición";
                     espacios--;
-                } else if (probArmaDisparo < 60) {
+                } else if (probArmaDisparo < 55) {
                     armaDisparo = "trabuco";
                     espacios--;
-                } else if (probArmaDisparo < 90) {
+                } else if (probArmaDisparo < 80) {
                     armaDisparo = "ristra de pistolas";
+                    espacios--;
+                } else if (probArmaDisparo < 90) {
+                    armaDisparo = "pistola";
                     espacios--;
                 }
             }
@@ -96,7 +99,7 @@
                 if (probArmadura < 30 && espacios >= 1) {
                     armadura = "ligera";
                     espacios--;
-                } else if (probArmadura < 50 && espacios >= 2 && !["espada y daga", "montante", "espadón", "alabarda"].includes(armaCombate) && !["arco compuesto", "arcabuz de caza", "arcabuz de repetición", "trabuco"].includes(armaDisparo)) {
+                } else if (probArmadura < 50 && espacios >= 2 && !["espada y daga", "montante", "espadón", "alabarda"].includes(armaCombate) && !["arco compuesto", "arcabuz de caza", "arcabuz de repetición", "trabuco", "ristra de pistolas"].includes(armaDisparo)) {
                     armadura = "ligera y escudo";
                     espacios -= 2;
                 } else if (probArmadura < 80 && espacios >= 2) {
