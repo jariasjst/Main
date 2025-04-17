@@ -12,7 +12,7 @@
 
     canvas {
       border: 5px solid #471e00;
-      width: 60%;
+      width: 100%;
       height: auto;
       max-width: 1000px;
       aspect-ratio: 5 / 4;
@@ -65,8 +65,7 @@
       vacio: [
         [21, 11], [15, 11]
       ],
-      DDiego: [
-        [13, 9]
+      
       ]
     };
 
@@ -128,7 +127,7 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // --- 1. Dibujar la imagen de fondo escalada y centrada ---
-      const margin = size;  // margen de media celda
+      const margin = size *1.5;  // margen de media celda
       const imgX = margin;
       const imgY = margin;
       const imgWidth = canvas.width - 2 * margin;
