@@ -8,16 +8,14 @@
       text-align: center;
       font-family: sans-serif;
       background-color: #DEB887;
+      margin: 0;
+      padding: 0;
     }
 
     canvas {
       border: 5px solid #471e00;
-      width: 50%;
-      height: 50%;
-      max-width: 1000px;
-      aspect-ratio: 5 / 4;
       display: block;
-      margin: 0 auto;
+      margin: 20px auto;
     }
 
     button {
@@ -30,14 +28,17 @@
 </head>
 <body>
   <h1>Mapa de eventos</h1>
-  <canvas id="hexCanvas" width="1000" height="800"></canvas>
+  <canvas id="hexCanvas" width="960" height="730"></canvas>
   <br/>
   <button onclick="highlightRandomHex()">Producir evento</button>
 
   <script>
     const canvas = document.getElementById("hexCanvas");
     const ctx = canvas.getContext("2d");
-    const size = 24;
+
+    // 🟠 Tamaño del hexágono (de centro a vértice)
+    const hexSize = 28;
+
     const mapCols = 23;
     const mapRows = 17;
 
@@ -92,8 +93,8 @@
     añadirHexagonosARango("vacio", 14, 13, 16);
 
     function hexToPixel(q, r) {
-      const x = size * 3/2 * q;
-      const y = size * Math.sqrt(3) * (r + 0.5 * (q % 2));
+      const x = hexSize * 3/2 * q;
+      const y = hexSize * Math.sqrt(3) * (r + 0.5 * (q % 2));
       return [x, y];
     }
 
@@ -101,8 +102,8 @@
       ctx.beginPath();
       for (let i = 0; i < 6; i++) {
         const angle = Math.PI / 3 * i;
-        const xi = x + size * Math.cos(angle);
-        const yi = y + size * Math.sin(angle);
+        const xi = x + hexSize * Math.cos(angle);
+        const yi = y + hexSize * Math.sin(angle);
         if (i === 0) ctx.moveTo(xi, yi);
         else ctx.lineTo(xi, yi);
       }
@@ -127,24 +128,29 @@
     function drawMap(highlighted = null) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // --- 1. Dibujar la imagen de fondo escalada y centrada ---
-const imgWidth = 830;
-const imgHeight = 750;
-const imgX = (canvas.width - imgWidth) / 2;
-const imgY = (canvas.height - imgHeight) / 2;
+      // Calcular límites reales de los hexágonos
+      const allHexPixels = hexes.map(([q, r]) => hexToPixel(q, r));
+      const xValues = allHexPixels.map(p => p[0]);
+      const yValues = allHexPixels.map(p => p[1]);
+      const minX = Math.min(...xValues);
+      const maxX = Math.max(...xValues);
+      const minY = Math.min(...yValues);
+      const maxY = Math.max(...yValues);
 
-ctx.drawImage(backgroundImage, imgX, imgY, imgWidth, imgHeight);
-      
-      // --- 2. Dibujar los hexágonos ---
-      const [firstX, firstY] = hexToPixel(0, 0);
-      const [lastX, lastY] = hexToPixel(mapCols - 1, mapRows - 1);
-      const offsetX = (canvas.width - (lastX + size - firstX)) / 2;
-      const offsetY = (canvas.height - (lastY + size - firstY)) / 2;
+const hexMapWidth = 1000;  // en píxeles
+const hexMapHeight = 780;
+const hexMapX = 18;       // margen izquierdo
+const hexMapY = 6; 
 
+//Imagen: distancia de los márgenes izquierdo y superior, y tamaño en px (ancho, alto)
+
+ctx.drawImage(backgroundImage, 0, 0, 970, 790);
+
+      //Dibujar cada hexágono y texto
       for (const [q, r] of hexes) {
         const [x, y] = hexToPixel(q, r);
-        const cx = x + offsetX;
-        const cy = y + offsetY;
+        const cx = x + hexMapX - minX;
+        const cy = y + hexMapY - minY;
 
         const isRandom = highlighted && highlighted[0] === q && highlighted[1] === r;
         let color = "rgba(255,196,126,0.4)";
@@ -158,6 +164,15 @@ ctx.drawImage(backgroundImage, imgX, imgY, imgWidth, imgHeight);
         drawHex(cx, cy, color);
         drawCoordinates(cx, cy, q, r);
       }
+
+      // 💬 Mostrar en consola (opcional)
+      console.log("Imagen:", {
+        hexSize,
+        hexMapWidth,
+        hexMapHeight,
+        hexMapX,
+        hexMapY
+      });
     }
 
     function highlightRandomHex() {
