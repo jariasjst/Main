@@ -12,10 +12,8 @@
     }
     canvas {
       border: 5px solid #471e00;
-        background-image: url('MapaNoHex.png');  
-        background-size: 830px 710px;   
-        background-repeat: no-repeat;
-        background-position: 42% 50%;
+
+        
     }
     button {
       margin-top: 10px;
@@ -161,6 +159,16 @@ else if (regiones.DDiego.some(h => h[0] === q && h[1] === r)) color = "rgb(255, 
       drawMap(random);
     }
 
+const backgroundImage = new Image();
+backgroundImage.src = 'MapaNoHex.png';
+
+backgroundImage.onload = function () {
+  drawMap(); // solo dibuja el mapa cuando la imagen está lista
+};
+
+
+    
+    
     drawMap(); // Dibuja el mapa al cargar
   </script>
 </body>
