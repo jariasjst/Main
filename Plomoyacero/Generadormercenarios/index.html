@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Personajes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-amber-100 flex items-center justify-center h-screen font-serif text-xl">
+    <div class="bg-amber-200 p-6 rounded-lg shadow-lg w-96">
+        <h1 class="text-xl font-bold mb-4 text-center">Mercenario disponible</h1>
+        <button onclick="generarPersonaje()" class="bg-yellow-600 text-white px-8 py-2 rounded w-full mb-4">Investigar</button>
+        <div id="resultado" class="text-gray-800 text-lg leading-relaxed"></div>
+    </div>
+
+    <script>
+        const nombres = ["Miguel", "Sancho", "Joan", "Hernán", "Fernando", "Hernando", "Giacomo", "Francisco", "Ambrosio", "Abdul", "Omar", "Alí", "Braulio", "Íñigo", "Wilhelm", "August", "Hans", "Franz", "Pedro", "Juan", "Santiago", "Sebastiano", "Lope", "Anselmo", "Cósimo", "Cosme", "Lorenzo", "Gianbattista", "Leon", "Luis", "Antonio", "François", "Louis", "Henri", "Salvatore", "Enrico", "Ugo", "Giovanni", "Gian Lorenzo", "Donato", "Michelangelo", "Raffaello"];
+        const rasgosPositivosLista = [
+            "anfibio", "alerta", "asesino", "astuto", "bruto", "caballeroso", "caballero andante", "camuflado", "carga atronadora", "cazador", "como una roca", "superviviente", "devoto", "diestro verdadero", "dos puños", "escurridizo", "esquivar", "experto en armadura", "explorador", "famoso", "fuerte", "grande", "grito de batalla", "hombre de la calle", "hombre de los bosques", "imparable", "infiltrador", "inteligente", "juego de pies", "jugador", "juramento", "leal", "luchador afortunado", "luchador callejero", "médico", "mutilar", "nervios de acero", "observador", "pequeño", "púgil", "imponente", "ráfaga de golpes", "rajagargantas", "relámpago", "saltador", "sanguinario", "sangre fría", "saqueador", "sexto sentido", "sigiloso", "soldado", "tirador afortunado", "trucos sucios", "veloz", "vengador", "visión nocturna", "vista de águila"
+        ];
+        const rasgosNegativosLista = [
+            "alucinaciones", "arrogante", "borracho", "brazos débiles", "buscador de gloria", "cobarde", "desafortunado", "enfermizo", "frágil", "gatillo pesado", "infame", "lento", "mal presagio", "malos recuerdos", "meditabundo", "memento mori", "miedo a la pólvora", "obsesionado con la venganza", "novato", "torpe", "tuerto", "vanidoso"
+        ];
+
+        function getRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generarPersonaje() {
+            let espacios = 2;
+            let resultado = "<strong>Nombre:</strong> " + getRandom(nombres) + "<br>";
+
+            // Calcular rasgos negativos primero
+            let probNegativo = Math.random() * 100;
+            let rasgosNegativos = [];
+            if (probNegativo >= 95) {
+                rasgosNegativos.push(getRandomNumber(1, 22));
+                rasgosNegativos.push(getRandomNumber(1, 22));
+                espacios += 2;
+            } else if (probNegativo >= 85) {
+                rasgosNegativos.push(getRandomNumber(1, 22));
+                espacios += 1;
+            }
+
+            // Arma de combate
+            let probArmaCombate = Math.random() * 100;
+            let armaCombate = "espada";
+            if (probArmaCombate < 10) {
+                armaCombate = "puñal";
+                espacios++;
+            } else if (probArmaCombate < 15) {
+                armaCombate = "lanza";
+            } else if (probArmaCombate < 20) {
+                armaCombate = "martillo";
+            }
+            resultado += `<strong>Arma de combate:</strong> ${armaCombate}<br>`;
+
+            // Arma de disparo
+            let probArmaDisparo = Math.random() * 100;
+            let armaDisparo = "ninguna";
+            if (armaCombate !== "lanza" && armaCombate !== "martillo") {
+                if (probArmaDisparo < 6) {
+                    armaDisparo = "arco";
+                    espacios--;
+                } else if (probArmaDisparo < 30) {
+                    armaDisparo = "arcabuz";
+                    espacios--;
+                } else if (probArmaDisparo < 39) {
+                    armaDisparo = "ballesta";
+                    espacios--;
+                } else if (probArmaDisparo < 49) {
+                    armaDisparo = "trabuco";
+                    espacios--;
+                } else if (probArmaDisparo < 59) {
+                    armaDisparo = "pistola";
+                    espacios--;
+                }
+            }
+            resultado += `<strong>Arma de disparo:</strong> ${armaDisparo}<br>`;
+
+
+            // Armadura
+            let armadura = "ninguna";
+            if (espacios > 0) {
+                let probArmadura = Math.random() * 100;
+                if (probArmadura < 30 && espacios >= 1) {
+                    armadura = "ligera";
+                    espacios--;
+                } else if (probArmadura < 45 && espacios >= 2) {
+                    armadura = "ligera y escudo";
+                    espacios -= 2;
+                } else if (probArmadura < 50 && espacios >= 2) {
+                    armadura = "pesada";
+                    espacios -= 2;
+                }
+                resultado += `<strong>Armadura:</strong> ${armadura}<br>`;
+            }
+
+            // Equipamiento
+            let equipamiento = "ninguno";
+            if (espacios > 0) {
+                equipamiento = Math.random() < 0.2 ? "sí" : "ninguno";
+                if (equipamiento === "sí") espacios--;
+            }
+            resultado += `<strong>Equipamiento:</strong> ${equipamiento}<br>`;
+
+            // Rasgos positivos
+            let rasgosPositivos = [];
+            while (espacios > 0) {
+                let nuevoRasgo;
+                do {
+                    nuevoRasgo = getRandomNumber(1, 57);
+                } while (rasgosPositivos.includes(nuevoRasgo));
+                rasgosPositivos.push(rasgosPositivosLista[nuevoRasgo - 1]);
+                espacios--;
+            }
+            resultado += `<strong>Rasgos positivos:</strong> ${rasgosPositivos.length ? rasgosPositivos.join(", ") : "ninguno"}<br>`;
+
+            // Rasgos negativos (al final)
+            resultado += `<strong>Rasgos negativos:</strong> ${rasgosNegativos.length ? rasgosNegativos.map(num => rasgosNegativosLista[num - 1]).join(", ") : "ninguno"}<br>`;
+
+            document.getElementById("resultado").innerHTML = resultado;
+        }
+    </script>
+</body>
+</html>
